@@ -17,7 +17,7 @@
 # 1. Import packages
 #       - connecting to sql server -> sqlite3
 #       - making plots             -> matplotlib.pyplot
-#       - performing stats         -> pandas?
+#       - performing stats         -> pandas
 
 # 2. Receive input
 #       - variables:
@@ -29,15 +29,13 @@
 
 # 3. Query database
 #    a. build query
-#       - filter by month
-#   - filter by year
-#- pull all data values
+#  - filter by month
+#       - filter by year
+#           - pull all data values
 #
-#
-#
-
 #    b. establish connection
 #    c. execute query
+#    d. store monthID lists for all years.
 
 # 4. Transform data into usable lists
 
