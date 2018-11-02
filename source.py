@@ -15,26 +15,29 @@
 #PseudoCode
 
 # 1. Import packages
-#       - connecting to sql server -> sqlite3
-#       - to pull datetimes
-#       - making plots             -> matplotlib.pyplot
-#       - performing stats         -> pandas
-
+#   - connecting to sql server  -> sqlite3
 import sqlite3
+#   - to pull datetimes         -> datetime
 import datetime
+#   - making plots              -> matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
-import pandas
+#   - performing stats          -> pandas as pd
+import pandas as pd
+#______________________
+
+
+
+
 
 # 2. Receive input
-#       - variables:
-#              1. site ID
-#              2. monthID
-#              3. yearID
-#              4.
-
+#   - variables:
+#       1. site ID
 siteID = input('Please input the SiteID to be analyzed: ')
+#       2. monthID
 yearID = input('Please select the year to be analyzed: ')
+#       3. yearID
 monthID = input('Please select the month to be displayed: ')
+#______________________
 
 
 # 3. Query database
@@ -42,9 +45,7 @@ monthID = input('Please select the month to be displayed: ')
 conn = sqlite3.connect('Logan_River_Temperature_ODM.sqlite')
 
 #   b. build query
-#  - filter by month    (do filtering in pandas dataframe)
-#       - filter by year
-#           - pull all data values
+#   - query all data values for SiteId = ?          (do filtering in pandas dataframe)
 sql_statement = 'SELECT LocalDateTime, DataValue  ' \
                 'FROM datavalues ' \
                 'WHERE VariableID = 1 AND SiteID = ' + siteID + ' AND DataValue <> -9999 ' \
@@ -54,28 +55,44 @@ sql_statement = 'SELECT LocalDateTime, DataValue  ' \
 cursor = conn.cursor()
 cursor.execute(sql_statement)
 rows = cursor.fetchall()
-
+#______________________
 
 
 # 4. Transform data into usable lists
-#       - pull all data
+#   a. transfer from lists to indexed dataframe
+#   -> pull all data
+#   -> use zip to transform query data into rows
+LocalDateTime, DataValue = zip(*rows)
+#   -> load into overall  pandas dataframe
+#       - Will convert LocalDateTime values to string before building plot
+df = pd.DataFrame({'Date': LocalDateTime, 'Temp': DataValue})
+#   -> convert date column into pandas_to_datetime type
+df['Date'] = pd.to_datetime(df['Date'])
+#   -> set date as index
+df = df.set_index(df['Date'])
+df = df.sort_index()
 
-localDateTimes, dataValues = zip(*rows)
+#   b. Split dataframe based on input (month/year)
+#   -> create new dataframe for each month from all years, i.e. july data from '14,'15,'16.
 
-# Convert the localDateTime values from string values
-# to date/time values
+split2014 = df['2014-01-01': '2014-01-31']
 
-# First create an empty list for the converted date/time values
-plotDates = []
-# Loop through the localDateTimes tuple and convert the values to date/time
-# Append the converted values to the plotDates list
-for x in localDateTimes:
-    plotDates.append(datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
 
-#       - get data in over all pandas dataframe
-#                -> see class 20 example
+
 #                 - sort by year into dataframes
-#
+
+
+    # Convert the localDateTime values from string values
+    # to date/time values
+    #   First create an empty list for the converted date/time values
+    #plotDates = []
+    #   Loop through the localDateTimes tuple and convert the values to date/time
+    #   Append the converted values to the plotDates list
+    #for x in localDateTimes:
+    #    plotDates.append(datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
+
+
+
 
 # 5. Perform calculations
 #    a. time series plot for month
@@ -86,7 +103,6 @@ for x in localDateTimes:
 #           i. use longer time interval
 
 # 6. Import into graph
-
 # Create a plot of the LocalDateTime and
 # DataValue lists. Make it a solid grey
 # line with no markers.
