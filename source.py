@@ -57,79 +57,46 @@ cursor.execute(sql_statement)
 rows = cursor.fetchall()
 #______________________
 
-#commit
+
 # 4. Transform data into usable lists
 #   a. transfer from lists to indexed dataframe
 #   -> pull all data
-#   -> use zip to transform query data into rows
+#   -> use zip to transform query data into rows1
 LocalDateTime, DataValue = zip(*rows)
-#   -> load into overall  pandas dataframe
-#       - Will convert LocalDateTime values to string before building plot
-df = pd.DataFrame({'Date': LocalDateTime, 'Temp': DataValue})
-#   -> convert date column into pandas_to_datetime type
-df['Date'] = pd.to_datetime(df['Date'])
-#   -> set date as index
-df = df.set_index(df['Date'])
-df = df.sort_index()
-
-#   b. Split dataframe based on input (month/year)
-#   -> create new dataframe for each month from all years, i.e. july data from '14,'15,'16.
-
-split2014 = df['2014-01-01': '2014-01-31']
+#   -> load into overall pandas dataframe
+data_df = pd.DataFrame({'Date': LocalDateTime, 'Temp':DataValue})
+# Duplicate date column
+# Convert date column to datetime
+data_df['index'] = data_df['Date']
+data_df['Date'] = pd.to_datetime(data_df['Date'], infer_datetime_format=True)
+data_df = data_df.set_index('index')
 
 
-
-#                 - sort by year into dataframes
-
-
-    # Convert the localDateTime values from string values
-    # to date/time values
-    #   First create an empty list for the converted date/time values
-    #plotDates = []
-    #   Loop through the localDateTimes tuple and convert the values to date/time
-    #   Append the converted values to the plotDates list
-    #for x in localDateTimes:
-    #    plotDates.append(datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
-
-
-
-
-# 5. Perform calculations
-#    a. time series plot for month
-#       - see class20_example2
-#    b. stats
-#    c. histogram
-#    d. year to year comparison
-#           i. use longer time interval
-
-# 6. Import into graph
-# Create a plot of the LocalDateTime and
-# DataValue lists. Make it a solid grey
-# line with no markers.
-plt.figure(figsize=(9,5))
-plt.plot(plotDates, dataValues, color='grey',
+data_df.plot('Date', 'Temp',kind='line',
          linestyle='solid', markersize=0)
 
-
-# 7. Output graph
-#    a. seperate window
+# Generate a plot of the data subset
+#data_df.plot(y='Temp', kind='line', use_index=False,
+#            style='-', ylim=[-0.5, 90], marker='o',
+#            label='Water Temp')
 
 # Get the current axis of the plot and
 # set the x and y-axis labels
-ax = plt.gca()
-ax.set_ylabel('Temperature ($^\circ$C)')
-ax.set_xlabel('Date/Time')
-ax.grid(True)
-
-# Set the title
-ax.set_title('Water temperature in the Logan '
-             'River \n at the Utah Water Research '
-             'Laboratory')
-#    b. save graph
-# Save the plot to a file
-plt.savefig('Example_Plot.png')
+#ax = plt.gca()
+#ax.set_ylabel('Temp (C)')
+#ax.set_xlabel('Date/Time')
+#ax.grid(True)
 
 plt.show()
+
+
+
+
+
+
+
+
+
 
 
 
