@@ -5,10 +5,9 @@
 # Created by: Joseph Brewer
 # FOR: CEE6110 - Hydroinformatics - Horsburgh
 # DUE: 11/6/2018
-# Description: This script will present a month by month
-# water temperature summary from the Logan River ODM database,
-# complete with a 4 pane plot describing and
-# illustrating a variety of statistics for the selected site and month.
+# Description: This script will present a comparison of monthly
+# water temperature data on a yearly basis for the Logan River ODM database
+# for the month of September.  Site selection input will be a feature.
 #____________________________________________
 
 
@@ -28,19 +27,18 @@ import pandas as pd
 
 
 
-
-# 2. Receive input
+# 3. Receive input
 #   - variables:
 #       1. site ID
 siteID = input('Please input the SiteID to be analyzed: ')
 #       2. monthID
-yearID = input('Please select the year to be analyzed: ')
+#yearID = input('Please select the year to be analyzed: ')
 #       3. yearID
-monthID = input('Please select the month to be displayed: ')
+#month = input('Please select the month to be displayed: ')
 #______________________
 
 
-# 3. Query database
+# 4. Query database
 #    a. establish connection
 conn = sqlite3.connect('Logan_River_Temperature_ODM.sqlite')
 
@@ -58,33 +56,72 @@ rows = cursor.fetchall()
 
 
 
-# 4. Transform data into usable lists
+# 5. Transform data into usable lists
 #   a. transfer from lists to indexed dataframe
-#   - pull all data
-#   - use zip to transform query data into rows1
+# pull all data
+# use zip to transform query data into rows1
 LocalDateTime, DataValue = zip(*rows)
-#   - load into overall pandas dataframe
+# load into overall pandas dataframe
 data_df = pd.DataFrame({'Date': LocalDateTime, 'Temp':DataValue})
 # Duplicate date column
-#data_df['index'] = data_df['Date']
+data_df['index'] = data_df['Date']
 # Convert date column to datetime
 data_df['Date'] = pd.to_datetime(data_df['Date'], infer_datetime_format=True)
 # Set index for slicing
-#data_df = data_df.set_index('index')
+data_df = data_df.set_index('index')
 
-# Generate plot
-data_df.plot('Date', 'Temp',kind='line',
-         linestyle='solid', markersize=0,
-             label='Water Temp')
+# 6. Slice months out of all yearly blocks
+df_2014 = data_df['2014-09-01 00:00:00':'2014-09-30 23:59:59']
+df_2015 = data_df['2015-09-01 00:00:00':'2015-09-30 23:59:59']
+df_2016 = data_df['2016-09-01 00:00:00':'2016-09-30 23:59:59']
+df_2017 = data_df['2017-09-01 00:00:00':'2017-09-30 23:59:59']
 
+# Convert date format so values will plot over each other.
+df_2014['Date'] = df_2014['Date'].dt.strftime('%m-%d')
+df_2015['Date'] = df_2015['Date'].dt.strftime('%m-%d')
+df_2016['Date'] = df_2016['Date'].dt.strftime('%m-%d')
+df_2017['Date'] = df_2017['Date'].dt.strftime('%m-%d')
 
-
-# Get the current axis of the plot and
-# set the x and y-axis labels
+#fig, ax = plt.subplots(2,2)
+#plt.subplot(2,2,1)
+df_2014.plot('Date', 'Temp',kind='line',
+       linestyle='solid', markersize=0,
+           label='Water Temp')
+#Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
 ax.set_xlabel('Date/Time')
 ax.grid(True)
+
+
+# 7. Generate plot
+#fig, ax = plt.subplots(2,2)
+
+#plt.subplot(2,2,1)
+#plt.plot(df_2014['Date'],df_2014['Temp'])
+
+#plt.subplot(2,2,2)
+#plt.plot(df_2015['Date'],df_2014['Temp'])
+
+#plt.subplot(2,2,3)
+#plt.plot(df_2016['Date'],df_2014['Temp'])
+
+#plt.subplot(2,2,4)
+#plt.plot(df_2017['Date'],df_2014['Temp'])
+
+
+#data_df.plot('Date', 'Temp',kind='line',
+#         linestyle='solid', markersize=0,
+#            label='Water Temp')
+#Set the x and y-axis labels
+#ax = plt.gca()
+#ax.set_ylabel('Temp (C)')
+#ax.set_xlabel('Date/Time')
+#ax.grid(True)
+
+
+
+
 
 plt.show()
 
