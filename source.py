@@ -57,7 +57,7 @@ cursor.execute(sql_statement)
 rows = cursor.fetchall()
 #______________________
 
-
+#commit
 # 4. Transform data into usable lists
 #   a. transfer from lists to indexed dataframe
 #   -> pull all data
