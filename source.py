@@ -55,37 +55,36 @@ sql_statement = 'SELECT LocalDateTime, DataValue  ' \
 cursor = conn.cursor()
 cursor.execute(sql_statement)
 rows = cursor.fetchall()
-#______________________
+
 
 
 # 4. Transform data into usable lists
 #   a. transfer from lists to indexed dataframe
-#   -> pull all data
-#   -> use zip to transform query data into rows1
+#   - pull all data
+#   - use zip to transform query data into rows1
 LocalDateTime, DataValue = zip(*rows)
-#   -> load into overall pandas dataframe
+#   - load into overall pandas dataframe
 data_df = pd.DataFrame({'Date': LocalDateTime, 'Temp':DataValue})
 # Duplicate date column
+#data_df['index'] = data_df['Date']
 # Convert date column to datetime
-data_df['index'] = data_df['Date']
 data_df['Date'] = pd.to_datetime(data_df['Date'], infer_datetime_format=True)
-data_df = data_df.set_index('index')
+# Set index for slicing
+#data_df = data_df.set_index('index')
 
-
+# Generate plot
 data_df.plot('Date', 'Temp',kind='line',
-         linestyle='solid', markersize=0)
+         linestyle='solid', markersize=0,
+             label='Water Temp')
 
-# Generate a plot of the data subset
-#data_df.plot(y='Temp', kind='line', use_index=False,
-#            style='-', ylim=[-0.5, 90], marker='o',
-#            label='Water Temp')
+
 
 # Get the current axis of the plot and
 # set the x and y-axis labels
-#ax = plt.gca()
-#ax.set_ylabel('Temp (C)')
-#ax.set_xlabel('Date/Time')
-#ax.grid(True)
+ax = plt.gca()
+ax.set_ylabel('Temp (C)')
+ax.set_xlabel('Date/Time')
+ax.grid(True)
 
 plt.show()
 
