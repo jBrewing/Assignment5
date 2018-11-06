@@ -24,6 +24,7 @@ import pandas as pd
 
 
 # 3. Receive input
+# Thoroughly describe input format.
 siteID = input('\n\nPlease input the SiteID to be analyzed.\n\n '
                'Options are: \n'
                ' \tSite 1\n'
@@ -36,11 +37,11 @@ siteID = input('\n\nPlease input the SiteID to be analyzed.\n\n '
 
 # 4. Query database
 # a. establish connection with database. Filepath not necessary as
-#  database in same directory.
+#  database is in same directory.
 conn = sqlite3.connect('Logan_River_Temperature_ODM.sqlite')
 
 # b. build query
-#   - query all data values for SiteId = X
+# query all data values for SiteId = X
 sql_statement = 'SELECT LocalDateTime, DataValue  ' \
                 'FROM datavalues ' \
                 'WHERE VariableID = 1 AND SiteID = ' + siteID + ' AND DataValue <> -9999 ' \
@@ -60,19 +61,20 @@ rows = cursor.fetchall()
 LocalDateTime, DataValue = zip(*rows)
 
 # load 'LocalDateTime' & 'DataValue' into overall pandas dataframe
+# with column titles "Date" and "Temp"
 data_df = pd.DataFrame({'Date': LocalDateTime, 'Temp':DataValue})
 
-# Duplicate date column
+# Duplicate "Date" column
 data_df['index'] = data_df['Date']
 
-# Convert date column to datetime
+# Convert "Date" column to datetime format with pandas function
 data_df['Date'] = pd.to_datetime(data_df['Date'], infer_datetime_format=True)
 
-# Set index for slicing
+# Set data frame index for slicing using duplicated "Date" column
 data_df = data_df.set_index('index')
 
 
-# 6. Slice september data out of all yearly blocks
+# 6. Slice september data out of all yearly blocks in over all data frame
 df_2014 = data_df['2014-09-01 00:00:00':'2014-09-30 23:59:59']
 df_2015 = data_df['2015-09-01 00:00:00':'2015-09-30 23:59:59']
 df_2016 = data_df['2016-09-01 00:00:00':'2016-09-30 23:59:59']
@@ -86,7 +88,7 @@ df_2017['Date'] = df_2017['Date'].dt.strftime('%m-%d')
 
 
 # 7. Plot results
-# Set colors, graphy type, markertype, limits, and label
+# Set colors, graph type, marker type, limits, and label
 # 2014 data
 df_2014.plot('Date', 'Temp',color ='green',kind='line',
              linestyle='solid', markersize=0, ylim=[4, 22],
