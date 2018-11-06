@@ -11,45 +11,38 @@
 #____________________________________________
 
 
-#PseudoCode
+
 
 # 1. Import packages
-#   - connecting to sql server  -> sqlite3
+#   - connecting to sql server
 import sqlite3
-#   - to pull datetimes         -> datetime
-import datetime
-#   - making plots              -> matplotlib.pyplot as plt
+#   - making plots
 import matplotlib.pyplot as plt
-#   - performing stats          -> pandas as pd
+#   - performing stats
 import pandas as pd
-#______________________
-
 
 
 
 # 3. Receive input
-#   - variables:
-#       1. site ID
-siteID = input('Please input the SiteID to be analyzed: ')
-#       2. monthID
-#yearID = input('Please select the year to be analyzed: ')
-#       3. yearID
-#month = input('Please select the month to be displayed: ')
-#______________________
+siteID = input('\n\nPlease input the SiteID to be analyzed.\n '
+               'Options are Site 1, 2, 3 & 9. '
+               'Please input as "1", "2", "3," etc:  ')
 
 
 # 4. Query database
-#    a. establish connection
+# a. establish connection with database. Filepath not necessary as
+#  database in same directory.
 conn = sqlite3.connect('Logan_River_Temperature_ODM.sqlite')
 
-#   b. build query
-#   - query all data values for SiteId = ?          (do filtering in pandas dataframe)
+# b. build query
+#   - query all data values for SiteId = X
 sql_statement = 'SELECT LocalDateTime, DataValue  ' \
                 'FROM datavalues ' \
                 'WHERE VariableID = 1 AND SiteID = ' + siteID + ' AND DataValue <> -9999 ' \
                 'AND QualityControlLevelID = 1'
 
-#    c. execute query
+# c. execute query with cursor object and fetch all
+#  query results with .fetchall()
 cursor = conn.cursor()
 cursor.execute(sql_statement)
 rows = cursor.fetchall()
@@ -57,20 +50,24 @@ rows = cursor.fetchall()
 
 
 # 5. Transform data into usable lists
-#   a. transfer from lists to indexed dataframe
-# pull all data
-# use zip to transform query data into rows1
+# a. transfer from lists to indexed dataframe
+# pull all data and use zip to transform query data into rows
 LocalDateTime, DataValue = zip(*rows)
-# load into overall pandas dataframe
+
+# load 'LocalDateTime' & 'DataValue' into overall pandas dataframe
 data_df = pd.DataFrame({'Date': LocalDateTime, 'Temp':DataValue})
+
 # Duplicate date column
 data_df['index'] = data_df['Date']
+
 # Convert date column to datetime
 data_df['Date'] = pd.to_datetime(data_df['Date'], infer_datetime_format=True)
+
 # Set index for slicing
 data_df = data_df.set_index('index')
 
-# 6. Slice months out of all yearly blocks
+
+# 6. Slice september data out of all yearly blocks
 df_2014 = data_df['2014-09-01 00:00:00':'2014-09-30 23:59:59']
 df_2015 = data_df['2015-09-01 00:00:00':'2015-09-30 23:59:59']
 df_2016 = data_df['2016-09-01 00:00:00':'2016-09-30 23:59:59']
@@ -82,43 +79,49 @@ df_2015['Date'] = df_2015['Date'].dt.strftime('%m-%d')
 df_2016['Date'] = df_2016['Date'].dt.strftime('%m-%d')
 df_2017['Date'] = df_2017['Date'].dt.strftime('%m-%d')
 
-#fig, ax = plt.subplots(2,2)
-#plt.subplot(2,2,1)
-df_2014.plot('Date', 'Temp',kind='line',
-       linestyle='solid', markersize=0,
-           label='Water Temp')
+
+# 7. Plot results.
+fig = plt.figure()
+
+# 2014 data
+df_2014.plot('Date', 'Temp',color ='green',kind='line',
+             linestyle='solid', markersize=0,
+             marker = 'o', label='2014')
 #Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
-ax.set_xlabel('Date/Time')
+ax.set_xlabel('Date/Time [Septembet 1-30]')
 ax.grid(True)
 
-
-# 7. Generate plot
-#fig, ax = plt.subplots(2,2)
-
-#plt.subplot(2,2,1)
-#plt.plot(df_2014['Date'],df_2014['Temp'])
-
-#plt.subplot(2,2,2)
-#plt.plot(df_2015['Date'],df_2014['Temp'])
-
-#plt.subplot(2,2,3)
-#plt.plot(df_2016['Date'],df_2014['Temp'])
-
-#plt.subplot(2,2,4)
-#plt.plot(df_2017['Date'],df_2014['Temp'])
-
-
-#data_df.plot('Date', 'Temp',kind='line',
-#         linestyle='solid', markersize=0,
-#            label='Water Temp')
+# 2015 data
+df_2015.plot('Date', 'Temp',color='red',kind='line',
+             linestyle='solid', markersize=0,
+             marker = 'o', label='2015')
 #Set the x and y-axis labels
-#ax = plt.gca()
-#ax.set_ylabel('Temp (C)')
-#ax.set_xlabel('Date/Time')
-#ax.grid(True)
+ax = plt.gca()
+ax.set_ylabel('Temp (C)')
+ax.set_xlabel('Date/Time[Septembet 1-30]')
+ax.grid(True)
 
+# 2016 data
+df_2016.plot('Date', 'Temp',color='blue',kind='line',
+             linestyle='solid', markersize=0,
+             marker = 'o', label='2016')
+#Set the x and y-axis labels
+ax = plt.gca()
+ax.set_ylabel('Temp (C)')
+ax.set_xlabel('Date/Time[Septembet 1-30]')
+ax.grid(True)
+
+# 2017 data
+df_2017.plot('Date', 'Temp',color='black',kind='line',
+             linestyle='solid', markersize=0,
+             marker = 'o', label='2017')
+#Set the x and y-axis labels
+ax = plt.gca()
+ax.set_ylabel('Temp (C)')
+ax.set_xlabel('Date/Time[Septembet 1-30]')
+ax.grid(True)
 
 
 
@@ -136,4 +139,3 @@ plt.show()
 
 
 
-print('havent burst into flmame yet')
