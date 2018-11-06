@@ -24,9 +24,14 @@ import pandas as pd
 
 
 # 3. Receive input
-siteID = input('\n\nPlease input the SiteID to be analyzed.\n '
-               'Options are Site 1, 2, 3 & 9. '
+siteID = input('\n\nPlease input the SiteID to be analyzed.\n\n '
+               'Options are: \n'
+               ' \tSite 1\n'
+               ' \tSite 2\n'
+               ' \tSite 3\n'
+               ' \tSite 9. \n\n'
                'Please input as "1", "2", "3," etc:  ')
+
 
 
 # 4. Query database
@@ -80,53 +85,53 @@ df_2016['Date'] = df_2016['Date'].dt.strftime('%m-%d')
 df_2017['Date'] = df_2017['Date'].dt.strftime('%m-%d')
 
 
-# 7. Plot results.
-fig = plt.figure()
-
+# 7. Plot results
+# Set colors, graphy type, markertype, limits, and label
 # 2014 data
 df_2014.plot('Date', 'Temp',color ='green',kind='line',
-             linestyle='solid', markersize=0,
+             linestyle='solid', markersize=0, ylim=[4, 22],
              marker = 'o', label='2014')
-#Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
 ax.set_xlabel('Date/Time [Septembet 1-30]')
+plt.title('Site ' + siteID + ': September 2014')
 ax.grid(True)
 
 # 2015 data
 df_2015.plot('Date', 'Temp',color='red',kind='line',
-             linestyle='solid', markersize=0,
+             linestyle='solid', markersize=0,ylim=[4, 22],
              marker = 'o', label='2015')
-#Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
 ax.set_xlabel('Date/Time[Septembet 1-30]')
+plt.title('Site ' + siteID + ': September 2015')
 ax.grid(True)
 
 # 2016 data
 df_2016.plot('Date', 'Temp',color='blue',kind='line',
-             linestyle='solid', markersize=0,
+             linestyle='solid', markersize=0, ylim=[4, 22],
              marker = 'o', label='2016')
-#Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
 ax.set_xlabel('Date/Time[Septembet 1-30]')
+plt.title('Site ' + siteID + ': September 2016')
 ax.grid(True)
 
 # 2017 data
 df_2017.plot('Date', 'Temp',color='black',kind='line',
-             linestyle='solid', markersize=0,
+             linestyle='solid', markersize=0, ylim=[4, 22],
              marker = 'o', label='2017')
-#Set the x and y-axis labels
 ax = plt.gca()
 ax.set_ylabel('Temp (C)')
 ax.set_xlabel('Date/Time[Septembet 1-30]')
+plt.title('Site ' + siteID + ': September 2017')
 ax.grid(True)
 
-
-
-
 plt.show()
+
+
+
+print('Done!')
 
 
 
